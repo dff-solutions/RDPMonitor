@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>HipChat.Net</id>
+    <version>1.3</version>
+    <title>HipChat.Net</title>
+    <authors>Hugo Rodger-Brown</authors>
+    <owners>Hugo Rodger-Brown</owners>
+    <licenseUrl>https://github.com/hugorodgerbrown/HipChat.net</licenseUrl>
+    <projectUrl>https://github.com/hugorodgerbrown/HipChat.net</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>HipChat API library for .NET</description>
+    <releaseNotes>Various updates, see GitHub for details of commits.</releaseNotes>
+    <copyright>Copyright 2013</copyright>
+    <language>en-GB</language>
+  </metadata>
+</package>

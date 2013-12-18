@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/01/nuspec.xsd">
+  <metadata minClientVersion="1.0.0">
+    <id>dff.Extensions</id>
+    <version>1.0.19</version>
+    <title>Extensions for C#</title>
+    <authors>anoehre</authors>
+    <owners>anoehre</owners>
+    <licenseUrl>https://github.com/dff-solutions/dff.Extensions/blob/master/LICENSE.md</licenseUrl>
+    <projectUrl>https://github.com/dff-solutions/dff.Extensions</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Extensions for C# Aplications (including CF)</description>
+    <summary>Extensions for C# Aplications (including CF)</summary>
+    <releaseNotes />
+    <copyright>dff solutions GmbH, Germany</copyright>
+    <language>de-DE</language>
+    <tags>C# Extensions</tags>
+  </metadata>
+</package>
