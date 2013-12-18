@@ -40,7 +40,7 @@ namespace RemoteMonitorConsole
             {
                 _lastCommand = statusReport;
                 HipChatClient.SendMessage("9826fa999d476cd7ae21aed8ff4063", "RemoteDesktop", "RemoteInfoBot",
-                    statusReport);
+                    statusReport, false, HipChatClient.BackgroundColor.gray, HipChatClient.MessageFormat.html);
             }
         }
 
@@ -73,8 +73,9 @@ namespace RemoteMonitorConsole
                               info.ServerList.Aggregate(string.Empty, (current, x) => current + (x + ", "))
                                   .RemoveLast(2);
                 }
+                report += "<br>";
             }
-            return report + "\n";
+            return report ;
         }
 
         private static void WriteStatusToServer(RemoteEventArgs e)
