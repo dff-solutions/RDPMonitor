@@ -56,7 +56,6 @@ namespace RemoteMonitorConsole
                     var ser = new XmlSerializer(typeof(RemoteStatusInfo));
                     report.Add((RemoteStatusInfo)ser.Deserialize(fs));
                 }
-                
             }
             return report;
         }
@@ -66,15 +65,15 @@ namespace RemoteMonitorConsole
             var report = string.Empty;
             foreach (var info in StatusInfoGet())
             {
-                report += info.Username + " / Status: " + info.State;
                 if (info.ServerList.Any())
                 {
-                    report += " / Server: " +
-                              info.ServerList.Aggregate(string.Empty, (current, x) => current + (x + ", "))
+                    report += info.ServerList.Aggregate(string.Empty, (current, x) => current + (x + ", "))
                                   .RemoveLast(2);
+                    report += " (" + info.Username + ")";
+                    report += "<br>";
                 }
-                report += "<br>";
             }
+            if (string.IsNullOrEmpty(report)) report += "Alles frei!";
             return report ;
         }
 
