@@ -1,6 +1,7 @@
 ﻿#region
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
@@ -16,11 +17,10 @@ namespace RemoteMonitorConsole
     {
         private static string _lastCommand;
 
-        private static void Main(string[] args)
+        private static void Main()
         {
             var remoteMonitor = new RemoteMonitorWorker();
             remoteMonitor.StatusChanged += RemoteMonitor_StatusChanged;
-
             Console.ReadLine();
         }
 
@@ -28,7 +28,7 @@ namespace RemoteMonitorConsole
         {
             WriteStatusToServer(e);
 
-            var statusReport = StatusReportGet();
+            var statusReport = StatusReportAsStringGet();
 
             Console.WriteLine(statusReport);
             SendToHipChat(statusReport);
@@ -44,18 +44,28 @@ namespace RemoteMonitorConsole
             }
         }
 
-        private static string StatusReportGet()
+        private static IEnumerable<RemoteStatusInfo> StatusInfoGet()
         {
-            var report = string.Empty;
+            var report = new List<RemoteStatusInfo>();
             var di = new DirectoryInfo("\\\\dffgoe\\projects\\dff\\intraweb\\remote_status");
+            if (!di.Exists) di.Create();
             foreach (var fileInfo in di.GetFiles("*.xml"))
             {
-                RemoteStatusInfo info;
                 using (var fs = new FileStream(fileInfo.FullName, FileMode.Open))
                 {
-                    var ser = new XmlSerializer(typeof (RemoteStatusInfo));
-                    info = (RemoteStatusInfo) ser.Deserialize(fs);
+                    var ser = new XmlSerializer(typeof(RemoteStatusInfo));
+                    report.Add((RemoteStatusInfo)ser.Deserialize(fs));
                 }
+                
+            }
+            return report;
+        }
+
+        private static string StatusReportAsStringGet()
+        {
+            var report = string.Empty;
+            foreach (var info in StatusInfoGet())
+            {
                 report += info.Username + " / Status: " + info.State;
                 if (info.ServerList.Any())
                 {
@@ -64,7 +74,7 @@ namespace RemoteMonitorConsole
                                   .RemoveLast(2);
                 }
             }
-            return report;
+            return report + "\n";
         }
 
         private static void WriteStatusToServer(RemoteEventArgs e)
