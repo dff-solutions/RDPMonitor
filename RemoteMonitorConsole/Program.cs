@@ -28,19 +28,20 @@ namespace RemoteMonitorConsole
         {
             WriteStatusToServer(e);
 
-            var statusReport = StatusReportAsStringGet();
+            var color=HipChatClient.BackgroundColor.gray;
+            var statusReport = StatusReportAsStringGet(out color);
 
             Console.WriteLine(statusReport);
-            SendToHipChat(statusReport);
+            SendToHipChat(statusReport, color);
         }
 
-        private static void SendToHipChat(string statusReport)
+        private static void SendToHipChat(string statusReport, HipChatClient.BackgroundColor color)
         {
             if (_lastCommand == null || _lastCommand != statusReport)
             {
                 _lastCommand = statusReport;
                 HipChatClient.SendMessage("9826fa999d476cd7ae21aed8ff4063", "RemoteDesktop", "RemoteInfoBot",
-                    statusReport, false, HipChatClient.BackgroundColor.gray, HipChatClient.MessageFormat.html);
+                    statusReport, false, color, HipChatClient.MessageFormat.html);
             }
         }
 
@@ -60,20 +61,23 @@ namespace RemoteMonitorConsole
             return report;
         }
 
-        private static string StatusReportAsStringGet()
+        private static string StatusReportAsStringGet(out HipChatClient.BackgroundColor color)
         {
             var report = string.Empty;
-            foreach (var info in StatusInfoGet())
+            var remoteStatusInfos = StatusInfoGet();
+            color = HipChatClient.BackgroundColor.gray;
+            foreach (var info in remoteStatusInfos.Where(x=>x.ServerList!=null).SelectMany(x => x.ServerList))
             {
-                if (info.ServerList.Any())
-                {
-                    report += info.ServerList.Aggregate(string.Empty, (current, x) => current + (x + ", "))
-                                  .RemoveLast(2);
-                    report += " (" + info.Username + ")";
-                    report += "<br>";
-                }
+                report += info;
+                var user = remoteStatusInfos.FirstOrDefault(x => x.ServerList.Contains(info)).Username;
+                report += " (" + user + ")";
+                report += "<br>";
             }
-            if (string.IsNullOrEmpty(report)) report += "Alles frei!";
+            if (string.IsNullOrEmpty(report))
+            {
+                color=HipChatClient.BackgroundColor.green;
+                report += "Alles frei!";
+            }
             return report ;
         }
 

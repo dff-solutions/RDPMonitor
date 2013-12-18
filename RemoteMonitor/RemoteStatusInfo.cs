@@ -11,7 +11,7 @@ namespace RemoteMonitor
 
         public override int GetHashCode()
         {
-            return (State + " " + ServerList.Aggregate(string.Empty,
+            return (State + " " + ServerList.OrderBy(x=>x).Aggregate(string.Empty,
                 (current, x) => current + (x + ", "))).GetHashCode();
         }
     }
