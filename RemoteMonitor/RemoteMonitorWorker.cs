@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading;
+using dff.Extensions;
 
 #endregion
 
@@ -68,7 +69,7 @@ namespace RemoteMonitor
                 {
                     returningInfo.ServerList.Add(
                         infoSplit.Where(x => !x.Contains("Remotedesktopverbindung")).Aggregate(string.Empty,
-                            (current, x) => current + (x + "-")).Trim());
+                            (current, x) => current + (x + "-")).Trim().RemoveLast(2));
                 }
             }
 

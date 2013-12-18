@@ -29,8 +29,8 @@ namespace RemoteMonitorConsole
             WriteStatusToServer(e);
 
             var statusReport = StatusReportGet();
-            Console.WriteLine(statusReport);
 
+            Console.WriteLine(statusReport);
             SendToHipChat(statusReport);
         }
 
