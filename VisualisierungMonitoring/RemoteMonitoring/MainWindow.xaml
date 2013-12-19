@@ -1,0 +1,22 @@
+﻿<Window x:Class="RemoteMonitoring.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="350" Width="525"
+        StateChanged="Window_StateChanged"
+        Closing="OnClose" >
+    <Grid>
+        <ToggleButton IsChecked="{Binding ElementName=pup, Path=IsOpen}" Content="Open Popup" Margin="100" Checked="ToggleButton_Checked"/>
+        <Popup Name="popup1"   
+        PlacementTarget ="{Binding ElementName=myButton}" 
+        Placement="AbsolutePoint" Visibility="Visible">
+            <TextBlock Height="60" Width="200"
+             TextWrapping="Wrap">
+                <TextBlock.Background>
+                    <ImageBrush ImageSource="pack://application:,,,/Resources/Sprechblase5_klein.png"/>
+                </TextBlock.Background>
+                    
+                    Popup positioned</TextBlock>
+        </Popup>
+    </Grid>
+</Window>
+        
