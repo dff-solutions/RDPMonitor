@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Serialization;
 using HipChat;
 using RemoteMonitor;
@@ -15,9 +15,7 @@ namespace RemoteMonitorConsole
 {
     internal class Program
     {
-        private static string _lastCommand;
-
-        private const string PathServerDirectory = "\\\\dffgoe\\projects\\dff\\intraweb\\remote_status";
+        private const string PathServerDirectory = "\\\\192.168.2.22\\projects\\dff\\intraweb\\remote_status";
         private const string HipChatToken = "9826fa999d476cd7ae21aed8ff4063";
         private const string HipChatRoom = "RemoteDesktop";
         private const string HipChatUser = "RemoteInfoBot";
@@ -31,7 +29,7 @@ namespace RemoteMonitorConsole
             remoteMonitor.Dispose();
         }
 
-        static void RemoteMonitor_StatusRemoteChanged(object sender, RemoteEventArgs e)
+        private static void RemoteMonitor_StatusRemoteChanged(object sender, RemoteEventArgs e)
         {
             var statusReport = StatusReportAsStringGet();
             Console.WriteLine(statusReport);
@@ -45,17 +43,13 @@ namespace RemoteMonitorConsole
             var statusReport = StatusReportAsStringGet(out color);
 
             Console.WriteLine(statusReport);
-            //SendToHipChat(statusReport, color);
+            SendToHipChat(statusReport, color);
         }
 
-        private static void SendToHipChat(string statusReport, HipChatClient.BackgroundColor color)
+        private static async void SendToHipChat(string statusReport, HipChatClient.BackgroundColor color)
         {
-            if (_lastCommand == null || _lastCommand != statusReport)
-            {
-                _lastCommand = statusReport;
-                HipChatClient.SendMessage(HipChatToken, HipChatRoom, HipChatUser,
-                    statusReport, false, color, HipChatClient.MessageFormat.html);
-            }
+            await Task.Run(() => HipChatClient.SendMessage(HipChatToken, HipChatRoom, HipChatUser,
+                statusReport, false, color, HipChatClient.MessageFormat.html));
         }
 
         private static string StatusReportAsStringGet()
@@ -69,7 +63,7 @@ namespace RemoteMonitorConsole
             var report = string.Empty;
             var remoteStatusInfos = StatusInfoGet();
             color = HipChatClient.BackgroundColor.gray;
-            foreach (var info in remoteStatusInfos.Where(x=>x.ServerList!=null).SelectMany(x => x.ServerList))
+            foreach (var info in remoteStatusInfos.Where(x => x.ServerList != null).SelectMany(x => x.ServerList))
             {
                 report += info;
                 var user = remoteStatusInfos.FirstOrDefault(x => x.ServerList.Contains(info)).Username;
@@ -78,10 +72,10 @@ namespace RemoteMonitorConsole
             }
             if (string.IsNullOrEmpty(report))
             {
-                color=HipChatClient.BackgroundColor.green;
+                color = HipChatClient.BackgroundColor.green;
                 report += "Alles frei!";
             }
-            return report ;
+            return report;
         }
 
         private static IEnumerable<RemoteStatusInfo> StatusInfoGet()
@@ -95,12 +89,13 @@ namespace RemoteMonitorConsole
                 {
                     using (var fs = new FileStream(fileInfo.FullName, FileMode.Open))
                     {
-                        var ser = new XmlSerializer(typeof(RemoteStatusInfo));
-                        report.Add((RemoteStatusInfo)ser.Deserialize(fs));
+                        var ser = new XmlSerializer(typeof (RemoteStatusInfo));
+                        report.Add((RemoteStatusInfo) ser.Deserialize(fs));
                     }
                 }
                 catch (Exception e)
-                {}
+                {
+                }
             }
             return report;
         }
@@ -109,10 +104,7 @@ namespace RemoteMonitorConsole
         {
             try
             {
-                var path = PathServerDirectory+"\\" + e.Info.Username + ".xml";
-                //if (File.Exists(path))
-                //    File.Delete(path);
-
+                var path = PathServerDirectory + "\\" + e.Info.Username + ".xml";
 
                 TextWriter txtW = new StreamWriter(path);
                 var seri = new XmlSerializer(e.Info.GetType());

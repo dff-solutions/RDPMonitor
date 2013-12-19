@@ -73,9 +73,11 @@ namespace RemoteMonitor
             if (_lastRemoteStatusInfo != null &&
                 _lastRemoteStatusInfo != null & returningInfo.GetHashCode() != _lastRemoteStatusInfo.GetHashCode())
             {
+                _lastRemoteStatusInfo = returningInfo;
                 OnMyStatusChanged(new RemoteEventArgs(returningInfo));
             }
-            _lastRemoteStatusInfo = returningInfo;
+            else _lastRemoteStatusInfo = returningInfo;
+            
 
         }
 
