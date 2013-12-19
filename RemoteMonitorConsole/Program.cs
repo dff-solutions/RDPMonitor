@@ -4,8 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Xml.Serialization;
-using dff.Extensions;
 using HipChat;
 using RemoteMonitor;
 
@@ -17,22 +17,35 @@ namespace RemoteMonitorConsole
     {
         private static string _lastCommand;
 
+        private const string PathServerDirectory = "\\\\dffgoe\\projects\\dff\\intraweb\\remote_status";
+        private const string HipChatToken = "9826fa999d476cd7ae21aed8ff4063";
+        private const string HipChatRoom = "RemoteDesktop";
+        private const string HipChatUser = "RemoteInfoBot";
+
         private static void Main()
         {
-            var remoteMonitor = new RemoteMonitorWorker();
-            remoteMonitor.StatusChanged += RemoteMonitor_StatusChanged;
+            var remoteMonitor = new RemoteMonitorWorker(PathServerDirectory);
+            remoteMonitor.MyStatusChanged += RemoteMonitor_MyStatusChanged;
+            remoteMonitor.StatusRemoteChanged += RemoteMonitor_StatusRemoteChanged;
             Console.ReadLine();
+            remoteMonitor.Dispose();
         }
 
-        private static void RemoteMonitor_StatusChanged(object sender, RemoteEventArgs e)
+        static void RemoteMonitor_StatusRemoteChanged(object sender, RemoteEventArgs e)
+        {
+            var statusReport = StatusReportAsStringGet();
+            Console.WriteLine(statusReport);
+        }
+
+        private static void RemoteMonitor_MyStatusChanged(object sender, RemoteEventArgs e)
         {
             WriteStatusToServer(e);
 
-            var color=HipChatClient.BackgroundColor.gray;
+            HipChatClient.BackgroundColor color;
             var statusReport = StatusReportAsStringGet(out color);
 
             Console.WriteLine(statusReport);
-            SendToHipChat(statusReport, color);
+            //SendToHipChat(statusReport, color);
         }
 
         private static void SendToHipChat(string statusReport, HipChatClient.BackgroundColor color)
@@ -40,25 +53,15 @@ namespace RemoteMonitorConsole
             if (_lastCommand == null || _lastCommand != statusReport)
             {
                 _lastCommand = statusReport;
-                HipChatClient.SendMessage("9826fa999d476cd7ae21aed8ff4063", "RemoteDesktop", "RemoteInfoBot",
+                HipChatClient.SendMessage(HipChatToken, HipChatRoom, HipChatUser,
                     statusReport, false, color, HipChatClient.MessageFormat.html);
             }
         }
 
-        private static IEnumerable<RemoteStatusInfo> StatusInfoGet()
+        private static string StatusReportAsStringGet()
         {
-            var report = new List<RemoteStatusInfo>();
-            var di = new DirectoryInfo("\\\\dffgoe\\projects\\dff\\intraweb\\remote_status");
-            if (!di.Exists) di.Create();
-            foreach (var fileInfo in di.GetFiles("*.xml"))
-            {
-                using (var fs = new FileStream(fileInfo.FullName, FileMode.Open))
-                {
-                    var ser = new XmlSerializer(typeof(RemoteStatusInfo));
-                    report.Add((RemoteStatusInfo)ser.Deserialize(fs));
-                }
-            }
-            return report;
+            HipChatClient.BackgroundColor color;
+            return StatusReportAsStringGet(out color);
         }
 
         private static string StatusReportAsStringGet(out HipChatClient.BackgroundColor color)
@@ -81,16 +84,45 @@ namespace RemoteMonitorConsole
             return report ;
         }
 
+        private static IEnumerable<RemoteStatusInfo> StatusInfoGet()
+        {
+            var report = new List<RemoteStatusInfo>();
+            var di = new DirectoryInfo(PathServerDirectory);
+            if (!di.Exists) di.Create();
+            foreach (var fileInfo in di.GetFiles("*.xml"))
+            {
+                try
+                {
+                    using (var fs = new FileStream(fileInfo.FullName, FileMode.Open))
+                    {
+                        var ser = new XmlSerializer(typeof(RemoteStatusInfo));
+                        report.Add((RemoteStatusInfo)ser.Deserialize(fs));
+                    }
+                }
+                catch (Exception e)
+                {}
+            }
+            return report;
+        }
+
         private static void WriteStatusToServer(RemoteEventArgs e)
         {
-            var path = "\\\\dffgoe\\projects\\dff\\intraweb\\remote_status\\" + e.Info.Username + ".xml";
-            if (File.Exists(path))
-                File.Delete(path);
+            try
+            {
+                var path = PathServerDirectory+"\\" + e.Info.Username + ".xml";
+                //if (File.Exists(path))
+                //    File.Delete(path);
 
-            TextWriter txtW = new StreamWriter(path);
-            var seri = new XmlSerializer(e.Info.GetType());
-            seri.Serialize(txtW, e.Info);
-            txtW.Close();
+
+                TextWriter txtW = new StreamWriter(path);
+                var seri = new XmlSerializer(e.Info.GetType());
+                seri.Serialize(txtW, e.Info);
+                txtW.Close();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+            }
         }
     }
 }

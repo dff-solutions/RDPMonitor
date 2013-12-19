@@ -1,18 +1,27 @@
-﻿using System.Collections.Generic;
+﻿#region
+
+using System.Collections.Generic;
 using System.Linq;
+
+#endregion
 
 namespace RemoteMonitor
 {
     public class RemoteStatusInfo
     {
-        public List<string> ServerList;
+        public readonly List<string> ServerList= new List<string>();
+
+        public RemoteStatusInfo()
+        {}
+        
         public Status State { get; set; }
         public string Username { get; set; }
 
         public override int GetHashCode()
         {
-            return (State + " " + ServerList.OrderBy(x=>x).Aggregate(string.Empty,
-                (current, x) => current + (x + ", "))).GetHashCode();
+            var s = State + " " + ServerList.OrderBy(x => x).Aggregate(string.Empty,
+                (current, x) => current + (x + ", "));
+            return s.GetHashCode();
         }
     }
 }

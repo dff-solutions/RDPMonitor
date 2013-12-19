@@ -1,6 +1,10 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Runtime.InteropServices;
 using System.Text;
+
+#endregion
 
 namespace RemoteMonitor
 {

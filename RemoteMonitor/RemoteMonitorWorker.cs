@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading;
@@ -22,10 +23,26 @@ namespace RemoteMonitor
     {
         private readonly Timer _timer;
         private RemoteStatusInfo _lastRemoteStatusInfo;
+        private FileSystemWatcher _watcher;
 
-        public RemoteMonitorWorker()
+        public RemoteMonitorWorker(string pathToServerDirectory)
         {
-            _timer = new Timer(GetStatus, new object(), 1000, 1000);
+            _timer = new Timer(GetRemoteStatus, new object(), 1000, 1000);
+
+            _watcher = new FileSystemWatcher(pathToServerDirectory)
+            {
+                NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastAccess,
+                Filter = "*.xml"
+            };
+            _watcher.Created += WatcherCreated;
+            _watcher.EnableRaisingEvents = true;
+        }
+
+        private void WatcherCreated(object sender, FileSystemEventArgs e)
+        {
+            //Bei Änderungen an der Eigenen Datei nichts machen!
+            if (e.Name.Contains(UsernameGet())) return;
+            OnStatusRemoteChanged(new RemoteEventArgs{Info = GetRemoteStatusFromServer()});
         }
 
         public void Dispose()
@@ -33,27 +50,40 @@ namespace RemoteMonitor
             _timer.Dispose();
         }
 
-        public event EventHandler<RemoteEventArgs> StatusChanged;
+        public event EventHandler<RemoteEventArgs> MyStatusChanged;
+        public event EventHandler<RemoteEventArgs> StatusRemoteChanged;
 
-        protected void OnStatusChanged(RemoteEventArgs e)
+        protected void OnMyStatusChanged(RemoteEventArgs e)
         {
-            var handler = StatusChanged;
+            var handler = MyStatusChanged;
             if (handler != null) handler(this, e);
         }
 
-        private void GetStatus(object state)
+        protected void OnStatusRemoteChanged(RemoteEventArgs e)
         {
-            var returningInfo = new RemoteStatusInfo {ServerList = new List<string>()};
+            var handler = StatusRemoteChanged;
+            if (handler != null) handler(this, e);
+        }
 
-            var identity = WindowsIdentity.GetCurrent();
-            if (identity == null) return;
+        private void GetRemoteStatus(object state)
+        {
+            var returningInfo = GetRemoteStatusFromServer();
+            if (returningInfo == null) return;
 
-            var principal = new WindowsPrincipal(identity);
-            returningInfo.Username = principal.Identity.Name;
+            if (_lastRemoteStatusInfo != null &&
+                _lastRemoteStatusInfo != null & returningInfo.GetHashCode() != _lastRemoteStatusInfo.GetHashCode())
+            {
+                OnMyStatusChanged(new RemoteEventArgs(returningInfo));
+            }
+            _lastRemoteStatusInfo = returningInfo;
 
-            if (returningInfo.Username.Contains("\\"))
-                returningInfo.Username = returningInfo.Username.Substring(returningInfo.Username.IndexOf("\\") + 1);
+        }
 
+        private static RemoteStatusInfo GetRemoteStatusFromServer()
+        {
+            var returningInfo = new RemoteStatusInfo() {Username = UsernameGet()};
+
+            if (string.IsNullOrEmpty(returningInfo.Username)) return null;
 
             var windows = new Windows();
             foreach (
@@ -74,12 +104,21 @@ namespace RemoteMonitor
             }
 
             returningInfo.State = returningInfo.ServerList.Any() ? Status.RDPAktiv : Status.RDPInaktiv;
+            return returningInfo;
+        }
 
-            if (_lastRemoteStatusInfo != null &&
-                _lastRemoteStatusInfo != null & returningInfo.GetHashCode() != _lastRemoteStatusInfo.GetHashCode())
-                OnStatusChanged(new RemoteEventArgs(returningInfo));
+        private static string UsernameGet()
+        {
+            var username = string.Empty;
+            var identity = WindowsIdentity.GetCurrent();
+            if (identity == null) return null;
 
-            _lastRemoteStatusInfo = returningInfo;
+            var principal = new WindowsPrincipal(identity);
+            username = principal.Identity.Name;
+
+            if (username.Contains("\\"))
+                username = username.Substring(username.IndexOf("\\") + 1);
+            return username;
         }
     }
 }
