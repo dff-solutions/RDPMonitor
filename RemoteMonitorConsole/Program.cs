@@ -34,6 +34,8 @@ namespace RemoteMonitorConsole
         {
             var statusReport = ServerClient.StatusReportAsStringGet(PathServerDirectory);
             Console.WriteLine(statusReport);
+            SendToHipChat(statusReport, color);
+        }
 
             HipChatClientDff.SendToHipChat(statusReport,
                 !e.Info.ServerList.Any()
