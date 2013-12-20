@@ -1,7 +1,6 @@
 ﻿#region
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Principal;
@@ -24,9 +23,11 @@ namespace RemoteMonitor
         private readonly Timer _timer;
         private RemoteStatusInfo _lastRemoteStatusInfo;
         private FileSystemWatcher _watcher;
+        private readonly string _pathToServerDirectory;
 
         public RemoteMonitorWorker(string pathToServerDirectory)
         {
+            _pathToServerDirectory = pathToServerDirectory;
             _timer = new Timer(GetRemoteStatus, new object(), 1000, 1000);
 
             _watcher = new FileSystemWatcher(pathToServerDirectory)
@@ -38,16 +39,16 @@ namespace RemoteMonitor
             _watcher.EnableRaisingEvents = true;
         }
 
+        public void Dispose()
+        {
+            _timer.Dispose();
+        }
+
         private void WatcherCreated(object sender, FileSystemEventArgs e)
         {
             //Bei Änderungen an der Eigenen Datei nichts machen!
             if (e.Name.Contains(UsernameGet())) return;
-            OnStatusRemoteChanged(new RemoteEventArgs{Info = GetRemoteStatusFromServer()});
-        }
-
-        public void Dispose()
-        {
-            _timer.Dispose();
+            OnStatusRemoteChanged(new RemoteEventArgs {Info = GetRemoteStatusFromServer()});
         }
 
         public event EventHandler<RemoteEventArgs> MyStatusChanged;
@@ -74,16 +75,15 @@ namespace RemoteMonitor
                 _lastRemoteStatusInfo != null & returningInfo.GetHashCode() != _lastRemoteStatusInfo.GetHashCode())
             {
                 _lastRemoteStatusInfo = returningInfo;
+                ServerClient.WriteStatusToServer(returningInfo, _pathToServerDirectory);
                 OnMyStatusChanged(new RemoteEventArgs(returningInfo));
             }
             else _lastRemoteStatusInfo = returningInfo;
-            
-
         }
 
         private static RemoteStatusInfo GetRemoteStatusFromServer()
         {
-            var returningInfo = new RemoteStatusInfo() {Username = UsernameGet()};
+            var returningInfo = new RemoteStatusInfo {Username = UsernameGet()};
 
             if (string.IsNullOrEmpty(returningInfo.Username)) return null;
 

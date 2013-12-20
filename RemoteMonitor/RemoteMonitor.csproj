@@ -33,6 +33,9 @@
     <Reference Include="dff.Extensions">
       <HintPath>..\packages\dff.Extensions.1.0.19\lib\dff.Extensions.dll</HintPath>
     </Reference>
+    <Reference Include="HipChat.Net">
+      <HintPath>..\packages\HipChat.Net.1.3\lib\net45\HipChat.Net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -43,10 +46,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Declarations.cs" />
+    <Compile Include="HipChatClient.cs" />
     <Compile Include="RemoteEventArgs.cs" />
     <Compile Include="RemoteMonitorWorker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoteStatusInfo.cs" />
+    <Compile Include="ServerClient.cs" />
     <Compile Include="Window.cs" />
     <Compile Include="Windows.cs" />
   </ItemGroup>

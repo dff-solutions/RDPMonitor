@@ -1,7 +1,11 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
+#endregion
 
 namespace RemoteMonitor
 {
@@ -35,7 +39,7 @@ namespace RemoteMonitor
         private void getWindows()
         {
             //Liste mit Fenstern befüllen
-            Declarations.EnumWindows(new WinCallBack(EnumWindowCallBack), 0);
+            Declarations.EnumWindows(EnumWindowCallBack, 0);
         }
 
         /// <summary>
