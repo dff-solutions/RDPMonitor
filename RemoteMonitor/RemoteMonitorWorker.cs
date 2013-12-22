@@ -28,7 +28,7 @@ namespace RemoteMonitor
         public RemoteMonitorWorker(string pathToServerDirectory)
         {
             _pathToServerDirectory = pathToServerDirectory;
-            _timer = new Timer(GetRemoteStatus, new object(), 1000, 1000);
+            _timer = new Timer(AnalyseWindows, new object(), 1000, 1000);
 
             _watcher = new FileSystemWatcher(pathToServerDirectory)
             {
@@ -48,11 +48,11 @@ namespace RemoteMonitor
         {
             //Bei Änderungen an der Eigenen Datei nichts machen!
             if (e.Name.Contains(UsernameGet())) return;
-            OnStatusRemoteChanged(new RemoteEventArgs {Info = GetRemoteStatusFromServer()});
+            OnStatusRemoteChanged();
         }
 
         public event EventHandler<RemoteEventArgs> MyStatusChanged;
-        public event EventHandler<RemoteEventArgs> StatusRemoteChanged;
+        public event EventHandler<EventArgs> StatusRemoteChanged;
 
         protected void OnMyStatusChanged(RemoteEventArgs e)
         {
@@ -60,28 +60,28 @@ namespace RemoteMonitor
             if (handler != null) handler(this, e);
         }
 
-        protected void OnStatusRemoteChanged(RemoteEventArgs e)
+        protected void OnStatusRemoteChanged()
         {
             var handler = StatusRemoteChanged;
-            if (handler != null) handler(this, e);
+            if (handler != null) handler(this, new EventArgs());
         }
 
-        private void GetRemoteStatus(object state)
+        private void AnalyseWindows(object state)
         {
-            var returningInfo = GetRemoteStatusFromServer();
-            if (returningInfo == null) return;
+            var info = AnalyseWindowsForRemoteSessions();
+            if (info == null) return;
 
             if (_lastRemoteStatusInfo != null &&
-                _lastRemoteStatusInfo != null & returningInfo.GetHashCode() != _lastRemoteStatusInfo.GetHashCode())
+                _lastRemoteStatusInfo != null & info.GetHashCode() != _lastRemoteStatusInfo.GetHashCode())
             {
-                _lastRemoteStatusInfo = returningInfo;
-                ServerClient.WriteStatusToServer(returningInfo, _pathToServerDirectory);
-                OnMyStatusChanged(new RemoteEventArgs(returningInfo));
+                _lastRemoteStatusInfo = info;
+                ServerClient.WriteStatusToServer(info, _pathToServerDirectory);
+                OnMyStatusChanged(new RemoteEventArgs(info));
             }
-            else _lastRemoteStatusInfo = returningInfo;
+            else _lastRemoteStatusInfo = info;
         }
 
-        private static RemoteStatusInfo GetRemoteStatusFromServer()
+        private static RemoteStatusInfo AnalyseWindowsForRemoteSessions()
         {
             var returningInfo = new RemoteStatusInfo {Username = UsernameGet()};
 

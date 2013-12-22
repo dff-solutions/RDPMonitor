@@ -24,7 +24,7 @@ namespace RemoteMonitorConsole
             remoteMonitor.Dispose();
         }
 
-        private static void RemoteMonitor_StatusRemoteChanged(object sender, RemoteEventArgs e)
+        private static void RemoteMonitor_StatusRemoteChanged(object sender, EventArgs e)
         {
             var statusReport = ServerClient.StatusReportAsStringGet(PathServerDirectory);
             Console.WriteLine(statusReport);
