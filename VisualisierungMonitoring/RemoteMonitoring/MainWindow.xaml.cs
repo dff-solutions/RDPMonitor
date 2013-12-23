@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,6 +18,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using RemoteMonitor;
+using Window = System.Windows.Window;
 
 
 namespace RemoteMonitoring
@@ -28,6 +31,10 @@ namespace RemoteMonitoring
     {
         DispatcherTimer timer = new DispatcherTimer();
         private System.Windows.Forms.NotifyIcon MyNotifyIcon;
+        private const string PathServerDirectory = "\\\\192.168.2.22\\projects\\dff\\intraweb\\remote_status";
+        private const string HipChatToken = "9826fa999d476cd7ae21aed8ff4063";
+        private const string HipChatRoom = "RemoteDesktop";
+        private const string HipChatUser = "RemoteInfoBot";
 
         public MainWindow()
         {
@@ -39,6 +46,9 @@ namespace RemoteMonitoring
                 new System.Windows.Forms.MouseEventHandler
                     (MyNotifyIcon_MouseDoubleClick);
             MyNotifyIcon.Visible = true;
+            var remoteMonitor = new RemoteMonitorWorker(PathServerDirectory);
+            remoteMonitor.MyStatusChanged += RemoteMonitor_MyStatusChanged;
+            remoteMonitor.StatusRemoteChanged += RemoteMonitor_StatusRemoteChanged;
             
         }
         private void MyNotifyIcon_MouseDoubleClick(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -81,6 +91,28 @@ namespace RemoteMonitoring
             popup1.VerticalOffset = Screen.PrimaryScreen.WorkingArea.Height - 80;
             popup1.Visibility = Visibility.Visible;
             popup1.IsOpen = true;
+        }
+
+        private void RemoteMonitor_StatusRemoteChanged(object sender, EventArgs e)
+        {
+            popup1.Placement = PlacementMode.AbsolutePoint;
+            popup1.HorizontalOffset = Screen.PrimaryScreen.WorkingArea.Width - 220;
+            popup1.VerticalOffset = Screen.PrimaryScreen.WorkingArea.Height - 80;
+            popup1.Visibility = Visibility.Visible;
+            popup1.IsOpen = true;
+        }
+
+        private void RemoteMonitor_MyStatusChanged(object sender, RemoteEventArgs e)
+        {
+            Thread s=new Thread(new ThreadStart(delegate
+                {
+                    popup1.Placement = PlacementMode.AbsolutePoint;
+                    popup1.HorizontalOffset = Screen.PrimaryScreen.WorkingArea.Width - 220;
+                    popup1.VerticalOffset = Screen.PrimaryScreen.WorkingArea.Height - 80;
+                    popup1.Visibility = Visibility.Visible;
+                    popup1.IsOpen = true;
+                }));
+            s.Start();
         }
     }
 }

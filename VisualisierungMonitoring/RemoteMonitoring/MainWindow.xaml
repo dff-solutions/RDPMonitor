@@ -10,12 +10,7 @@
         PlacementTarget ="{Binding ElementName=myButton}" 
         Placement="AbsolutePoint" Visibility="Visible">
             <TextBlock Height="60" Width="200"
-             TextWrapping="Wrap">
-                <TextBlock.Background>
-                    <ImageBrush ImageSource="pack://application:,,,/Resources/Sprechblase5_klein.png"/>
-                </TextBlock.Background>
-                    
-                    Popup positioned</TextBlock>
+             TextWrapping="Wrap">Popup positioned</TextBlock>
         </Popup>
     </Grid>
 </Window>
