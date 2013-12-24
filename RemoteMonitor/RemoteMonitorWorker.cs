@@ -99,9 +99,12 @@ namespace RemoteMonitor
                     w.winTitle.Substring(0, w.winTitle.IndexOf("- Remotedesktopverbindung")).Split("-".ToCharArray());
                 if (infoSplit.Length >= 2)
                 {
-                    returningInfo.ServerList.Add(
-                        infoSplit.Where(x => !x.Contains("Remotedesktopverbindung")).Aggregate(string.Empty,
-                            (current, x) => current + (x + "-")).Trim().RemoveLast(2));
+                    returningInfo.ServerList.Add(new Server
+                    {
+                        EnteredServerTime = DateTime.Now,
+                        Name = infoSplit.Where(x => !x.Contains("Remotedesktopverbindung")).Aggregate(string.Empty,
+                            (current, x) => current + (x + "-")).Trim().RemoveLast(2),
+                    });
                 }
             }
 

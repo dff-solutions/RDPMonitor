@@ -18,9 +18,9 @@ namespace RemoteMonitor
             var remoteStatusInfos = StatusInfoGet(projectsDffIntrawebRemoteStatus);
             foreach (var info in remoteStatusInfos.Where(x => x.ServerList != null).SelectMany(x => x.ServerList))
             {
-                report += info;
+                report += info.Name;
                 var user = remoteStatusInfos.FirstOrDefault(x => x.ServerList.Contains(info)).Username;
-                report += " (" + user + ")";
+                report += " (" + user + ", seit "+info.EnteredServerTime.ToString("g")+")";
                 report += "<br>";
             }
             if (string.IsNullOrEmpty(report))
