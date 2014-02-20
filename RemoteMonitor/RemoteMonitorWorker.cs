@@ -24,6 +24,7 @@ namespace RemoteMonitor
         private RemoteStatusInfo _lastRemoteStatusInfo;
         private FileSystemWatcher _watcher;
         private readonly string _pathToServerDirectory;
+        private DateTime _lastRemoteChange;
 
         public RemoteMonitorWorker(string pathToServerDirectory)
         {
@@ -32,10 +33,10 @@ namespace RemoteMonitor
 
             _watcher = new FileSystemWatcher(pathToServerDirectory)
             {
-                NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastAccess,
+                NotifyFilter = NotifyFilters.LastWrite,
                 Filter = "*.xml"
             };
-            _watcher.Created += WatcherCreated;
+            _watcher.Changed += WatcherCreated;
             _watcher.EnableRaisingEvents = true;
         }
 
@@ -47,7 +48,10 @@ namespace RemoteMonitor
         private void WatcherCreated(object sender, FileSystemEventArgs e)
         {
             //Bei Änderungen an der Eigenen Datei nichts machen!
-            if (e.Name.Contains(UsernameGet())) return;
+            if (e.Name.Contains(UsernameGet()) ||
+                new TimeSpan(DateTime.Now.Ticks - _lastRemoteChange.Ticks).TotalSeconds < 1) return;
+
+            _lastRemoteChange = DateTime.Now;
             OnStatusRemoteChanged();
         }
 
