@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Media;
 using System.Reflection;
 using System.Text;
 using System.Threading;
@@ -19,6 +20,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using RemoteMonitor;
+using HorizontalAlignment = System.Windows.HorizontalAlignment;
 using Window = System.Windows.Window;
 
 
@@ -49,8 +51,10 @@ namespace RemoteMonitoring
             var remoteMonitor = new RemoteMonitorWorker(PathServerDirectory);
             remoteMonitor.MyStatusChanged += RemoteMonitor_MyStatusChanged;
             remoteMonitor.StatusRemoteChanged += RemoteMonitor_StatusRemoteChanged;
-            
+            RemoteMonitor_StatusRemoteChanged(new object(), new EventArgs() );
+
         }
+
         private void MyNotifyIcon_MouseDoubleClick(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             this.Show();
@@ -80,39 +84,108 @@ namespace RemoteMonitoring
             popup1.HorizontalOffset = Screen.PrimaryScreen.WorkingArea.Width - 220;
             popup1.VerticalOffset = Screen.PrimaryScreen.WorkingArea.Height - 80;
             popup1.Visibility = Visibility.Visible;
-            popup1.IsOpen = true;
+            popup1.IsOpen = false;
             
-        }
-
-        private void ToggleButton_Checked(object sender, RoutedEventArgs e)
-        {
-            popup1.Placement = PlacementMode.AbsolutePoint;
-            popup1.HorizontalOffset = Screen.PrimaryScreen.WorkingArea.Width - 220;
-            popup1.VerticalOffset = Screen.PrimaryScreen.WorkingArea.Height - 80;
-            popup1.Visibility = Visibility.Visible;
-            popup1.IsOpen = true;
         }
 
         private void RemoteMonitor_StatusRemoteChanged(object sender, EventArgs e)
         {
-            popup1.Placement = PlacementMode.AbsolutePoint;
-            popup1.HorizontalOffset = Screen.PrimaryScreen.WorkingArea.Width - 220;
-            popup1.VerticalOffset = Screen.PrimaryScreen.WorkingArea.Height - 80;
-            popup1.Visibility = Visibility.Visible;
-            popup1.IsOpen = true;
+            // The Work to perform on another thread
+            ThreadStart start = delegate()
+            {
+             //This will work as its using the dispatcher
+            DispatcherOperation op = Dispatcher.BeginInvoke(
+                DispatcherPriority.Normal,
+                new Action<string>(CreatePopup), RemoteMonitor.ServerClient.StatusReportAsStringGet(PathServerDirectory));
+
+                DispatcherOperationStatus status = op.Status;
+                while (status != DispatcherOperationStatus.Completed)
+                {
+                    status = op.Wait(TimeSpan.FromMilliseconds(1000));
+                    if (status == DispatcherOperationStatus.Aborted)
+                    {
+                        // Alert Someone
+                    }
+                }
+            };
+            new Thread(start).Start();
+        }
+
+        private void CreatePopup(RemoteEventArgs e)
+        {
+            var popupText = new TextBlock();
+            if (e == null || e.Info == null || e.Info.ServerList == null || e.Info.ServerList.Count == 0)
+                popupText.Text = "Keine aktive .rdp Verbindung";
+            else
+            {
+                popupText.Text = "aktive Verbindungen: \r\n";
+                foreach (var server in e.Info.ServerList)
+                {
+                    popupText.Text += server + "\r\n";
+                }    
+                popupText.Text += e.Info.Username;
+            }
+            
+            setPopup(popupText);
+        }
+
+        private void CreatePopup(string e)
+        {
+            var popupText = new TextBlock();
+            popupText.Text = e.Replace("<br>","\r\n");
+            popupText.TextWrapping = TextWrapping.Wrap;
+            setPopup(popupText);
         }
 
         private void RemoteMonitor_MyStatusChanged(object sender, RemoteEventArgs e)
         {
-            Thread s=new Thread(new ThreadStart(delegate
+            // The Work to perform on another thread
+            ThreadStart start = delegate()
+            {
+                // ...
+
+                // This will work as its using the dispatcher
+                DispatcherOperation op = Dispatcher.BeginInvoke(
+                    DispatcherPriority.Normal,
+                    new Action<RemoteEventArgs>(CreatePopup),
+                    e);
+
+                DispatcherOperationStatus status = op.Status;
+                while (status != DispatcherOperationStatus.Completed)
                 {
-                    popup1.Placement = PlacementMode.AbsolutePoint;
-                    popup1.HorizontalOffset = Screen.PrimaryScreen.WorkingArea.Width - 220;
-                    popup1.VerticalOffset = Screen.PrimaryScreen.WorkingArea.Height - 80;
-                    popup1.Visibility = Visibility.Visible;
-                    popup1.IsOpen = true;
-                }));
-            s.Start();
+                    status = op.Wait(TimeSpan.FromMilliseconds(1000));
+                    if (status == DispatcherOperationStatus.Aborted)
+                    {
+                        // Alert Someone
+                    }
+                }
+            };
+            new Thread(start).Start();
+        }
+
+        private void setPopup(TextBlock popupText)
+        {
+            popupText.TextAlignment = TextAlignment.Center;
+            popupText.Background = Brushes.SteelBlue;
+            popupText.Foreground = Brushes.White;
+            popupText.Opacity = 0.9;
+            popup1.HorizontalOffset = Screen.PrimaryScreen.WorkingArea.Width - 220;
+            popup1.VerticalOffset = Screen.PrimaryScreen.WorkingArea.Height - 80;
+            popup1.Placement = PlacementMode.AbsolutePoint;
+            popup1.Child = popupText;
+            popup1.Height = 80;
+            popup1.Width = 220;
+            popup1.IsOpen = true;
+            var sound = new SoundPlayer(Assembly.GetExecutingAssembly().
+                     GetManifestResourceStream("Voicbeep.wav"));
+            sound.Play();
+        }
+
+        private void Popup1_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            this.Show();
+            this.WindowState = WindowState.Normal;
+            this.Visibility = Visibility.Visible;
         }
     }
 }

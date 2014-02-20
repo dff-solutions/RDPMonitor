@@ -37,8 +37,9 @@
     <Reference Include="dff.Extensions">
       <HintPath>..\..\RemoteMonitor\bin\Debug\dff.Extensions.dll</HintPath>
     </Reference>
-    <Reference Include="RemoteMonitor">
-      <HintPath>..\..\RemoteMonitor\bin\Debug\RemoteMonitor.dll</HintPath>
+    <Reference Include="RemoteMonitor, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Users\mfassmann\Desktop\RemoteMonitor.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -106,6 +107,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Sprechblase5_klein.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Voicbeep.wav" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,17 +1,19 @@
-﻿<Window x:Class="RemoteMonitoring.MainWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="RemoteMonitoring.MainWindow"
         Title="MainWindow" Height="350" Width="525"
         StateChanged="Window_StateChanged"
-        Closing="OnClose" >
-    <Grid>
-        <ToggleButton IsChecked="{Binding ElementName=pup, Path=IsOpen}" Content="Open Popup" Margin="100" Checked="ToggleButton_Checked"/>
-        <Popup Name="popup1"   
-        PlacementTarget ="{Binding ElementName=myButton}" 
-        Placement="AbsolutePoint" Visibility="Visible">
-            <TextBlock Height="60" Width="200"
-             TextWrapping="Wrap">Popup positioned</TextBlock>
-        </Popup>
-    </Grid>
+        Closing="OnClose">
+
+    <Border BorderBrush="#FF000000" BorderThickness="1,1,1,1" CornerRadius="8,8,8,8">
+        <Grid x:Name="Grid1">
+            <Popup x:Name="popup1"    
+			PlacementTarget ="{Binding ElementName=myButton}"
+			Placement="AbsolutePoint" Visibility="Visible" StaysOpen="False" IsOpen="True" 
+                   AllowsTransparency="True" PopupAnimation="Fade" MouseLeftButtonDown="Popup1_OnMouseLeftButtonDown">
+            </Popup>
+        </Grid>
+    </Border>
 </Window>
         
