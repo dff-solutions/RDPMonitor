@@ -187,5 +187,14 @@ namespace RemoteMonitoring
             this.WindowState = WindowState.Normal;
             this.Visibility = Visibility.Visible;
         }
+
+        private void Popup1_OnOpened(object sender, EventArgs e)
+        {
+            var timer = new DispatcherTimer();
+            timer.Tick += (delegate { popup1.IsOpen = false; timer.Stop(); });
+            timer.Interval = new TimeSpan(0, 0, 10);
+            timer.Start();
+            
+        }
     }
 }

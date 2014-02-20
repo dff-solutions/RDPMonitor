@@ -11,7 +11,7 @@
             <Popup x:Name="popup1"    
 			PlacementTarget ="{Binding ElementName=myButton}"
 			Placement="AbsolutePoint" Visibility="Visible" StaysOpen="False" IsOpen="True" 
-                   AllowsTransparency="True" PopupAnimation="Fade" MouseLeftButtonDown="Popup1_OnMouseLeftButtonDown">
+                   AllowsTransparency="True" PopupAnimation="Fade" MouseLeftButtonDown="Popup1_OnMouseLeftButtonDown" Opened="Popup1_OnOpened">
             </Popup>
         </Grid>
     </Border>
