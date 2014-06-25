@@ -41,9 +41,12 @@ namespace RemoteMonitoring
         public MainWindow()
         {
             InitializeComponent();
-            MyNotifyIcon = new NotifyIcon();
-            MyNotifyIcon.Icon = new System.Drawing.Icon(
-                            @"C:\Users\mfassmann\Downloads\Deleket-Soft-Scraps-Button-Blank-Green.ico");
+            MyNotifyIcon = new NotifyIcon
+                {
+                    Icon = new System.Drawing.Icon(
+                        @"C:\Users\mfassmann\Downloads\green.ico")
+                };
+
             MyNotifyIcon.MouseDoubleClick +=
                 new System.Windows.Forms.MouseEventHandler
                     (MyNotifyIcon_MouseDoubleClick);
@@ -52,7 +55,6 @@ namespace RemoteMonitoring
             remoteMonitor.MyStatusChanged += RemoteMonitor_MyStatusChanged;
             remoteMonitor.StatusRemoteChanged += RemoteMonitor_StatusRemoteChanged;
             RemoteMonitor_StatusRemoteChanged(new object(), new EventArgs() );
-
         }
 
         private void MyNotifyIcon_MouseDoubleClick(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -71,21 +73,6 @@ namespace RemoteMonitoring
         {
             e.Cancel = true;
             this.Visibility = Visibility.Collapsed;
-
-            timer.Tick += new EventHandler(dispatcherTimer_Tick);
-            timer.Interval = new TimeSpan(0, 0, 3);
-            timer.Start();
-        }
-
-        private void dispatcherTimer_Tick(object sender, EventArgs e)
-        {
-            timer.Stop();    
-            popup1.Placement = PlacementMode.AbsolutePoint;
-            popup1.HorizontalOffset = Screen.PrimaryScreen.WorkingArea.Width - 220;
-            popup1.VerticalOffset = Screen.PrimaryScreen.WorkingArea.Height - 80;
-            popup1.Visibility = Visibility.Visible;
-            popup1.IsOpen = false;
-            
         }
 
         private void RemoteMonitor_StatusRemoteChanged(object sender, EventArgs e)

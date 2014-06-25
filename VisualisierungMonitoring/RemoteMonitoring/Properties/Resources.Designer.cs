@@ -61,12 +61,12 @@ namespace RemoteMonitoring.Properties {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Icon ähnlich wie (Symbol).
         /// </summary>
-        internal static System.Drawing.Bitmap Sprechblase5_klein {
+        internal static System.Drawing.Icon green {
             get {
-                object obj = ResourceManager.GetObject("Sprechblase5_klein", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                object obj = ResourceManager.GetObject("green", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
             }
         }
         
