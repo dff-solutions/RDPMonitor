@@ -33,13 +33,19 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>RemoteMonitoring.App</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\green.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="dff.Extensions">
       <HintPath>..\..\RemoteMonitor\bin\Debug\dff.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="RemoteMonitor, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Users\mfassmann\Desktop\RemoteMonitor.dll</HintPath>
+      <HintPath>..\..\RemoteMonitor\bin\Debug\RemoteMonitor.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -100,13 +106,18 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Voicbeep.wav" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\green.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\green.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

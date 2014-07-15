@@ -17,7 +17,7 @@ namespace RemoteMonitor
 
         public override int GetHashCode()
         {
-            var s = State + " " + ServerList.OrderBy(x => x).Aggregate(string.Empty,
+            var s = State + " " + ServerList.OrderBy(x => x.Domain).Aggregate(string.Empty,
                 (current, x) => current + (x + ", "));
             return s.GetHashCode();
         }
@@ -26,6 +26,7 @@ namespace RemoteMonitor
     public class Server
     {
         public string Name { get; set; }
+        public string Domain { get; set; }
         public DateTime EnteredServerTime { get; set; }
     }
 }

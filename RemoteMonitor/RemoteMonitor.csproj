@@ -50,6 +50,7 @@
     <Compile Include="RemoteEventArgs.cs" />
     <Compile Include="RemoteMonitorWorker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RemoteServerDb.cs" />
     <Compile Include="RemoteStatusInfo.cs" />
     <Compile Include="ServerClient.cs" />
     <Compile Include="Window.cs" />

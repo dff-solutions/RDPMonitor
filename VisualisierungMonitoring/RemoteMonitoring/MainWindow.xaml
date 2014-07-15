@@ -2,18 +2,20 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="RemoteMonitoring.MainWindow"
-        Title="MainWindow" Height="350" Width="525"
+        Title="DFF RemoteMonitore" Height="600" Width="800"
         StateChanged="Window_StateChanged"
-        Closing="OnClose">
-
-    <Border BorderBrush="#FF000000" BorderThickness="1,1,1,1" CornerRadius="8,8,8,8">
-        <Grid x:Name="Grid1">
-            <Popup x:Name="popup1"    
+        Closing="OnClose" Name="Windo"
+        Icon="Resources/green.png"
+        WindowState="Minimized">
+    <Grid x:Name="Grid1">
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+            <WrapPanel Name="ServerWrapPanel"/>
+        </ScrollViewer>
+        <Popup x:Name="popup1"
 			PlacementTarget ="{Binding ElementName=myButton}"
 			Placement="AbsolutePoint" Visibility="Visible" StaysOpen="False" IsOpen="True" 
                    AllowsTransparency="True" PopupAnimation="Fade" MouseLeftButtonDown="Popup1_OnMouseLeftButtonDown" Opened="Popup1_OnOpened">
-            </Popup>
-        </Grid>
-    </Border>
+        </Popup>
+    </Grid>
 </Window>
         
